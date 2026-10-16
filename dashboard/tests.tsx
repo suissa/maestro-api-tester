@@ -14,7 +14,6 @@ function App() {
   ]);
   const [running, setRunning] = useState(false);
   const [exitCode, setExitCode] = useState<number | null>(null);
-  const [selected, setSelected] = useState(0);
   const [scroll, setScroll] = useState(0);
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [elapsed, setElapsed] = useState(0);
