@@ -21,7 +21,6 @@ jobs:
           node-version: 22
       - run: npm install
       - run: npx prettier --write dashboard/index.tsx dashboard/tests.tsx packages/tui/maestro-tui/package.json src/api-tester.ts src/server.ts tests/api.test.ts
-      - run: npm run build
       - name: Commit formatted files
         run: |
           if ! git diff --quiet; then
@@ -31,3 +30,4 @@ jobs:
             git commit -m "style: apply Prettier formatting"
             git push
           fi
+      - run: npm run build
