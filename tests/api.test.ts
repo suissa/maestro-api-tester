@@ -58,7 +58,7 @@ async function theUnknownRouteIsRejected(port: number): Promise<Response> {
 }
 
 test("the natural assertion primitive builds false predicates", () => {
-  const saysThisIsFalse = is(false, "ignored");
+  const saysThisIsFalse = is(false);
   I.hope.this().isFalse(saysThisIsFalse(true));
   I.hope.this().isTrue(saysThisIsFalse(false));
   I.hope.this().isFalse(isFalse(true));
@@ -66,7 +66,7 @@ test("the natural assertion primitive builds false predicates", () => {
 });
 
 test("the natural assertion primitive builds true predicates", () => {
-  const saysThisIsTrue = is(true, "ignored");
+  const saysThisIsTrue = is(true);
   I.hope.this().isTrue(saysThisIsTrue(true));
   I.hope.this().isFalse(saysThisIsTrue(false));
 });
