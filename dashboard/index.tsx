@@ -4,11 +4,11 @@ import { useState } from "react";
 import { describe, request } from "../src/api-tester.ts";
 
 const METHODS = [
-  { name: "GET", value: "GET" },
-  { name: "POST", value: "POST" },
-  { name: "PUT", value: "PUT" },
-  { name: "PATCH", value: "PATCH" },
-  { name: "DELETE", value: "DELETE" },
+  { name: "GET", value: "GET", description: "GET request" },
+  { name: "POST", value: "POST", description: "POST request" },
+  { name: "PUT", value: "PUT", description: "PUT request" },
+  { name: "PATCH", value: "PATCH", description: "PATCH request" },
+  { name: "DELETE", value: "DELETE", description: "DELETE request" },
 ];
 
 function App() {
