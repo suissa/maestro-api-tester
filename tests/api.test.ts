@@ -9,7 +9,8 @@ function theServerStartsWithHttp(server: http.Server): Promise<number> {
   return new Promise((resolve, reject) => {
     server.listen(0, "127.0.0.1", () => {
       const address = server.address();
-      if (!address || typeof address === "string") return reject(new Error("server did not receive a TCP address"));
+      if (!address || typeof address === "string")
+        return reject(new Error("server did not receive a TCP address"));
       resolve(address.port);
     });
     server.once("error", reject);
@@ -31,7 +32,9 @@ async function theRouteCatalogAnswers(port: number): Promise<Response> {
 }
 
 async function theEchoRouteAnswers(port: number): Promise<Response> {
-  return fetch(`http://127.0.0.1:${port}/echo?hello=maestro&mode=natural`);
+  return fetch(
+    `http://127.0.0.1:${port}/echo?hello=maestro&mode=natural`,
+  );
 }
 
 async function thePostEchoRouteAnswers(port: number): Promise<Response> {
@@ -75,7 +78,10 @@ test("the health route answers successfully", async () => {
     const response = await theHealthRouteAnswers(port);
     I.hope.this().isFalse(!response.ok);
     I.hope.this().isFalse(response.status !== 200);
-    const body = (await response.json()) as { ok: boolean; service: string };
+    const body = (await response.json()) as {
+      ok: boolean;
+      service: string;
+    };
     I.hope.this().isFalse(body.ok !== true);
     I.hope.this().isFalse(body.service !== "maestro-api-tester");
   } finally {
@@ -89,11 +95,19 @@ test("the route catalog describes every route", async () => {
   try {
     const response = await theRouteCatalogAnswers(port);
     I.hope.this().isFalse(!response.ok);
-    const body = (await response.json()) as { routes: Array<{ method: string; path: string }> };
+    const body = (await response.json()) as {
+      routes: Array<{ method: string; path: string }>;
+    };
     I.hope.this().isFalse(!Array.isArray(body.routes));
     I.hope.this().isFalse(body.routes.length < 4);
-    I.hope.this().isFalse(!body.routes.some((route) => route.path === "/health"));
-    I.hope.this().isFalse(!body.routes.some((route) => route.path === "/echo" && route.method === "POST"));
+    I.hope.this().isFalse(
+      !body.routes.some((route) => route.path === "/health"),
+    );
+    I.hope.this().isFalse(
+      !body.routes.some(
+        (route) => route.path === "/echo" && route.method === "POST",
+      ),
+    );
   } finally {
     await theServerStopsAfterTheTest(server);
   }
@@ -105,7 +119,10 @@ test("the GET echo route returns query parameters", async () => {
   try {
     const response = await theEchoRouteAnswers(port);
     I.hope.this().isFalse(!response.ok);
-    const body = (await response.json()) as { method: string; query: Record<string, string> };
+    const body = (await response.json()) as {
+      method: string;
+      query: Record<string, string>;
+    };
     I.hope.this().isFalse(body.method !== "GET");
     I.hope.this().isFalse(body.query.hello !== "maestro");
     I.hope.this().isFalse(body.query.mode !== "natural");
@@ -120,7 +137,10 @@ test("the POST echo route returns JSON bodies", async () => {
   try {
     const response = await thePostEchoRouteAnswers(port);
     I.hope.this().isFalse(!response.ok);
-    const body = (await response.json()) as { method: string; body: { hello: string; value: number } };
+    const body = (await response.json()) as {
+      method: string;
+      body: { hello: string; value: number };
+    };
     I.hope.this().isFalse(body.method !== "POST");
     I.hope.this().isFalse(body.body.hello !== "maestro");
     I.hope.this().isFalse(body.body.value !== 42);
