@@ -11,7 +11,9 @@
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
     "dashboard": "bun dashboard/index.tsx",
-    "start": "node --experimental-strip-types src/server.ts"
+    "start": "node --experimental-strip-types src/server.ts",
+    "test:dashboard": "bun dashboard/tests.tsx",
+    "test:dashboard:run": "node --experimental-strip-types --test --test-reporter=spec tests/*.test.ts"
   },
   "engines": {
     "node": ">=22.6"
