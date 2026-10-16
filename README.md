@@ -1,18 +1,29 @@
 # maestro-api-tester
 
-A small API tester with a natural-language test DSL and an OpenTUI + React terminal dashboard.
+A small API tester with a natural-language test DSL and OpenTUI + React terminal dashboards.
 
 ## Test
 
-The route tests use only Node's strict assertion API, `node:test`, `node:http`, and the native `fetch` API. There is no Supertest or other HTTP testing framework.
+The route tests use Node's strict assertion API, `node:test`, `node:http`, and native `fetch`; no Supertest or other HTTP testing framework is required.
+
+Run tests without the TUI (suitable for CI):
 
 ```bash
 npm test
 ```
 
+Run tests interactively with live stdout/stderr, individual test results, errors, and the final exit status in the OpenTUI dashboard:
+
+```bash
+bun install
+bun run test:dashboard
+```
+
+Press `Enter` or `R` to start/re-run the test suite. Use `↑`/`↓` to scroll output, `Home`/`End` to navigate, and `Q`/`Esc` to exit. The dashboard discovers every `*.test.ts` file under `tests/` and streams the native Node test runner's output while tests execute.
+
 Assertions intentionally read like a sentence:
 
-```js
+```ts
 I.hope.this().isFalse(response.status !== 200);
 ```
 
@@ -31,12 +42,11 @@ The sample server exposes:
 - `GET /echo?hello=maestro`
 - `POST /echo` with JSON
 
-## Dashboard
+## API request dashboard
 
-OpenTUI's React renderer provides the terminal UI.
+Launch the existing request dashboard with:
 
 ```bash
-bun install
 bun run dashboard
 ```
 
