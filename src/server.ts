@@ -13,7 +13,11 @@ export const routes: Route[] = [
   { method: "POST", path: "/echo", description: "Echo JSON body" },
 ];
 
-function sendJson(response: http.ServerResponse, status: number, value: unknown): void {
+function sendJson(
+  response: http.ServerResponse,
+  status: number,
+  value: unknown,
+): void {
   const payload = JSON.stringify(value);
   response.writeHead(status, {
     "content-type": "application/json; charset=utf-8",
@@ -35,7 +39,10 @@ export function createServer(): http.Server {
     const url = new URL(request.url || "/", "http://localhost");
 
     if (request.method === "GET" && url.pathname === "/health") {
-      return sendJson(response, 200, { ok: true, service: "maestro-api-tester" });
+      return sendJson(response, 200, {
+        ok: true,
+        service: "maestro-api-tester",
+      });
     }
 
     if (request.method === "GET" && url.pathname === "/routes") {
@@ -62,9 +69,15 @@ export function createServer(): http.Server {
   });
 }
 
-if (process.argv[1] && new URL(`file://${process.argv[1]}`).pathname === new URL(import.meta.url).pathname) {
+if (
+  process.argv[1] &&
+  new URL(`file://${process.argv[1]}`).pathname ===
+    new URL(import.meta.url).pathname
+) {
   const port = Number(process.env.PORT || 8787);
   createServer().listen(port, "127.0.0.1", () => {
-    console.log(`Maestro API Tester listening on http://127.0.0.1:${port}`);
+    console.log(
+      `Maestro API Tester listening on http://127.0.0.1:${port}`,
+    );
   });
 }
