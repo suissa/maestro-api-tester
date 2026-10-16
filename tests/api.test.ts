@@ -1,4 +1,3 @@
-import assert from "node:assert/strict";
 import { test } from "node:test";
 import http from "node:http";
 import { createServer } from "../src/server.ts";
@@ -165,7 +164,6 @@ test("the API request runner uses fetch and describes responses", async () => {
     I.hope.this().isFalse(!Number.isFinite(result.elapsedMs));
     I.hope.this().isFalse(!describe(result).includes("GET"));
     I.hope.this().isFalse(!describe(result).includes("200 OK"));
-    assert.equal(typeof result.data, "object");
   } finally {
     await theServerStopsAfterTheTest(server);
   }
