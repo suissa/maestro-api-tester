@@ -6,5 +6,5 @@ export function is<T>(what: T, expected?: T): Predicate<T> {
   return (value) => value === expected;
 }
 
-export const isFalse = (value: unknown): boolean => is(false, value)(value as boolean);
-export const isTrue = (value: unknown): boolean => is(true, value)(value as boolean);
+export const isFalse = (value: unknown): boolean => is(false, value)(value);
+export const isTrue = (value: unknown): boolean => is(true, value)(value);
