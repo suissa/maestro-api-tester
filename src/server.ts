@@ -76,8 +76,6 @@ if (
 ) {
   const port = Number(process.env.PORT || 8787);
   createServer().listen(port, "127.0.0.1", () => {
-    console.log(
-      `Maestro API Tester listening on http://127.0.0.1:${port}`,
-    );
+    console.log(`Maestro API Tester listening on http://127.0.0.1:${port}`);
   });
 }

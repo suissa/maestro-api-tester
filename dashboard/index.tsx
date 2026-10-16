@@ -92,7 +92,9 @@ function App() {
         </scrollbox>
       </box>
       <box style={{ border: true, padding: 1 }}>
-        <text>ENTER run request · q / ESC quit · Routes: /health /routes /echo</text>
+        <text>
+          ENTER run request · q / ESC quit · Routes: /health /routes /echo
+        </text>
       </box>
     </box>
   );

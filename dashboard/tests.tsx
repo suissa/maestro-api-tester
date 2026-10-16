@@ -117,7 +117,9 @@ function App() {
     if (key.name === "return" || key.name === "r") void runTests();
     if (key.name === "up") setScroll((value) => Math.max(0, value - 1));
     if (key.name === "down")
-      setScroll((value) => Math.min(Math.max(0, entries.length - 1), value + 1));
+      setScroll((value) =>
+        Math.min(Math.max(0, entries.length - 1), value + 1),
+      );
     if (key.name === "end") setScroll(Math.max(0, entries.length - 1));
     if (key.name === "home") setScroll(0);
   });

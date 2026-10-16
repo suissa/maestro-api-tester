@@ -32,9 +32,7 @@ async function theRouteCatalogAnswers(port: number): Promise<Response> {
 }
 
 async function theEchoRouteAnswers(port: number): Promise<Response> {
-  return fetch(
-    `http://127.0.0.1:${port}/echo?hello=maestro&mode=natural`,
-  );
+  return fetch(`http://127.0.0.1:${port}/echo?hello=maestro&mode=natural`);
 }
 
 async function thePostEchoRouteAnswers(port: number): Promise<Response> {
@@ -100,14 +98,16 @@ test("the route catalog describes every route", async () => {
     };
     I.hope.this().isFalse(!Array.isArray(body.routes));
     I.hope.this().isFalse(body.routes.length < 4);
-    I.hope.this().isFalse(
-      !body.routes.some((route) => route.path === "/health"),
-    );
-    I.hope.this().isFalse(
-      !body.routes.some(
-        (route) => route.path === "/echo" && route.method === "POST",
-      ),
-    );
+    I.hope
+      .this()
+      .isFalse(!body.routes.some((route) => route.path === "/health"));
+    I.hope
+      .this()
+      .isFalse(
+        !body.routes.some(
+          (route) => route.path === "/echo" && route.method === "POST",
+        ),
+      );
   } finally {
     await theServerStopsAfterTheTest(server);
   }
