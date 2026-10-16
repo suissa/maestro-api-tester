@@ -4,7 +4,7 @@
   "description": "A small API tester with a natural-language test DSL and OpenTUI dashboard",
   "type": "module",
   "scripts": {
-    "test": "node --test tests/*.test.js",
+    "test": "node --test tests/*.test.cjs",
     "dashboard": "bun dashboard/index.tsx",
     "start": "node src/server.js"
   },
