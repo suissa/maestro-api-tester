@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { isFalse, isTrue } from "./is.js";
+import { isFalse, isTrue } from "./is.ts";
 
 export const I = {
   hope: {
