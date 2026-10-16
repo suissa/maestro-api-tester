@@ -3,7 +3,7 @@ import http from "node:http";
 import { createServer } from "../src/server.ts";
 import { describe, request } from "../src/api-tester.ts";
 import { I } from "../src/expect.ts";
-import { is, isFalse, isTrue } from "../src/is.ts";
+import { is, isFalse } from "../src/is.ts";
 
 function theServerStartsWithHttp(server: http.Server): Promise<number> {
   return new Promise((resolve, reject) => {
