@@ -19,7 +19,12 @@ export const defaultHeaders = {
   accept: "application/json",
 };
 
-export async function request({ url, method = "GET", headers = {}, body }: RequestOptions): Promise<RequestResult> {
+export async function request({
+  url,
+  method = "GET",
+  headers = {},
+  body,
+}: RequestOptions): Promise<RequestResult> {
   if (!url) throw new TypeError("url is required");
 
   const init: RequestInit = {
@@ -39,7 +44,9 @@ export async function request({ url, method = "GET", headers = {}, body }: Reque
   const response = await fetch(url, init);
   const elapsedMs = Math.round(performance.now() - startedAt);
   const contentType = response.headers.get("content-type") || "";
-  const data = contentType.includes("application/json") ? await response.json() : await response.text();
+  const data = contentType.includes("application/json")
+    ? await response.json()
+    : await response.text();
 
   return {
     url,
