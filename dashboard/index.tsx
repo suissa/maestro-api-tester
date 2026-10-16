@@ -22,9 +22,13 @@ function App() {
     setBusy(true);
     try {
       const response = await request({ url, method, body: body || undefined });
-      setResult(`${describe(response)}\n\n${JSON.stringify(response.data, null, 2)}`);
+      setResult(
+        `${describe(response)}\n\n${JSON.stringify(response.data, null, 2)}`,
+      );
     } catch (error) {
-      setResult(`Request failed\n\n${error instanceof Error ? error.message : String(error)}`);
+      setResult(
+        `Request failed\n\n${error instanceof Error ? error.message : String(error)}`,
+      );
     } finally {
       setBusy(false);
     }
@@ -36,24 +40,53 @@ function App() {
   });
 
   return (
-    <box style={{ flexDirection: "column", padding: 1, backgroundColor: "#090b12", width: "100%", height: "100%" }}>
-      <box style={{ border: true, borderStyle: "double", padding: 1, marginBottom: 1 }}>
+    <box
+      style={{
+        flexDirection: "column",
+        padding: 1,
+        backgroundColor: "#090b12",
+        width: "100%",
+        height: "100%",
+      }}
+    >
+      <box
+        style={{
+          border: true,
+          borderStyle: "double",
+          padding: 1,
+          marginBottom: 1,
+        }}
+      >
         <text>
           <strong>MAESTRO API TESTER</strong> · OpenTUI / React
         </text>
       </box>
       <box style={{ flexDirection: "row", height: 7, marginBottom: 1 }}>
-        <box style={{ flexGrow: 1, border: true, padding: 1, marginRight: 1 }} title="Request">
+        <box
+          style={{ flexGrow: 1, border: true, padding: 1, marginRight: 1 }}
+          title="Request"
+        >
           <text>Method</text>
-          <select focused options={METHODS} onChange={(_, option) => setMethod(option?.value ?? "GET")} />
+          <select
+            focused
+            options={METHODS}
+            onChange={(_, option) => setMethod(option?.value ?? "GET")}
+          />
           <text>URL</text>
           <input value={url} onInput={setUrl} onSubmit={() => void run()} />
         </box>
         <box style={{ width: 44, border: true, padding: 1 }} title="JSON body">
-          <input value={body} onInput={setBody} placeholder='{"hello":"maestro"}' />
+          <input
+            value={body}
+            onInput={setBody}
+            placeholder='{"hello":"maestro"}'
+          />
         </box>
       </box>
-      <box style={{ flexGrow: 1, border: true, padding: 1, marginBottom: 1 }} title={busy ? "Running..." : "Response"}>
+      <box
+        style={{ flexGrow: 1, border: true, padding: 1, marginBottom: 1 }}
+        title={busy ? "Running..." : "Response"}
+      >
         <scrollbox style={{ flexGrow: 1 }}>
           <text>{result}</text>
         </scrollbox>
