@@ -1,13 +1,19 @@
 import http from "node:http";
 
-const routes = [
+export type Route = {
+  method: string;
+  path: string;
+  description: string;
+};
+
+export const routes: Route[] = [
   { method: "GET", path: "/health", description: "Health check" },
   { method: "GET", path: "/routes", description: "Route catalog" },
   { method: "GET", path: "/echo", description: "Echo query parameters" },
   { method: "POST", path: "/echo", description: "Echo JSON body" },
 ];
 
-function sendJson(response, status, value) {
+function sendJson(response: http.ServerResponse, status: number, value: unknown): void {
   const payload = JSON.stringify(value);
   response.writeHead(status, {
     "content-type": "application/json; charset=utf-8",
@@ -16,15 +22,15 @@ function sendJson(response, status, value) {
   response.end(payload);
 }
 
-async function readJson(request) {
-  const chunks = [];
-  for await (const chunk of request) chunks.push(chunk);
+async function readJson(request: http.IncomingMessage): Promise<unknown> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of request) chunks.push(Buffer.from(chunk));
   const text = Buffer.concat(chunks).toString("utf8");
   if (!text) return {};
   return JSON.parse(text);
 }
 
-export function createServer() {
+export function createServer(): http.Server {
   return http.createServer(async (request, response) => {
     const url = new URL(request.url || "/", "http://localhost");
 
@@ -55,8 +61,6 @@ export function createServer() {
     return sendJson(response, 404, { error: "route not found" });
   });
 }
-
-export { routes };
 
 if (process.argv[1] && new URL(`file://${process.argv[1]}`).pathname === new URL(import.meta.url).pathname) {
   const port = Number(process.env.PORT || 8787);
