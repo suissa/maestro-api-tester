@@ -1,10 +1,8 @@
 export function is(what, value) {
-  return (actual) => {
-    if (what === false) return !(actual);
-    if (what === true) return !!(actual);
-    return actual === value;
-  };
+  if (what === false) return (value) => !(value);
+  if (what === true) return (value) => !!(value);
+  return (actual) => actual === value;
 }
 
-export const isFalse = (value) => is(false, value)(value);
-export const isTrue = (value) => is(true, value)(value);
+export const isFalse = is(false, undefined);
+export const isTrue = is(true, undefined);
