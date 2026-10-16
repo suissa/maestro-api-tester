@@ -47,13 +47,17 @@ export async function request({
   const data = contentType.includes("application/json")
     ? await response.json()
     : await response.text();
+  const responseHeaders: Record<string, string> = {};
+  response.headers.forEach((value, key) => {
+    responseHeaders[key] = value;
+  });
 
   return {
     url,
     method: init.method as string,
     status: response.status,
     ok: response.ok,
-    headers: Object.fromEntries(response.headers.entries()),
+    headers: responseHeaders,
     data,
     elapsedMs,
   };
