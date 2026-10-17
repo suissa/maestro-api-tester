@@ -43,7 +43,8 @@ function App() {
     if (next.length === 0) return;
 
     setLines((current) => {
-      const startId = current.length === 0 ? 0 : current[current.length - 1].id + 1;
+      const startId =
+        current.length === 0 ? 0 : current[current.length - 1].id + 1;
       const additions = next.map((text, index) => ({
         id: startId + index,
         text,
@@ -93,7 +94,12 @@ function App() {
 
       const child = spawn(
         process.execPath,
-        ["--experimental-strip-types", "--test", "--test-reporter=spec", ...files],
+        [
+          "--experimental-strip-types",
+          "--test",
+          "--test-reporter=spec",
+          ...files,
+        ],
         {
           cwd: process.cwd(),
           env: { ...process.env, FORCE_COLOR: "0", NO_COLOR: "1" },
@@ -108,7 +114,12 @@ function App() {
 
       await new Promise<void>((resolve) => {
         child.once("error", (error) => {
-          append(error instanceof Error ? error.stack ?? error.message : String(error), "fail");
+          append(
+            error instanceof Error
+              ? (error.stack ?? error.message)
+              : String(error),
+            "fail",
+          );
           setExitCode(1);
           resolve();
         });
@@ -125,7 +136,10 @@ function App() {
         });
       });
     } catch (error) {
-      append(error instanceof Error ? error.stack ?? error.message : String(error), "fail");
+      append(
+        error instanceof Error ? (error.stack ?? error.message) : String(error),
+        "fail",
+      );
       setExitCode(1);
     } finally {
       setElapsed(Date.now() - runStartedAt);
@@ -148,14 +162,18 @@ function App() {
     if (key.name === "q" || key.name === "escape") process.exit(0);
     if (key.name === "return" || key.name === "r") void run();
     if (key.name === "up") setSelected((value) => Math.max(0, value - 1));
-    if (key.name === "down") setSelected((value) => Math.min(lines.length - 1, value + 1));
+    if (key.name === "down")
+      setSelected((value) => Math.min(lines.length - 1, value + 1));
     if (key.name === "home") setSelected(0);
     if (key.name === "end") setSelected(Math.max(0, lines.length - 1));
   });
 
   const visible = useMemo(() => {
     const height = 20;
-    const start = Math.max(0, Math.min(selected - height + 1, lines.length - height));
+    const start = Math.max(
+      0,
+      Math.min(selected - height + 1, lines.length - height),
+    );
     return lines.slice(start, start + height);
   }, [lines, selected]);
 
@@ -172,15 +190,32 @@ function App() {
         padding: 1,
       }}
     >
-      <box style={{ flexDirection: "column", border: true, padding: 1, marginBottom: 1 }}>
+      <box
+        style={{
+          flexDirection: "column",
+          border: true,
+          padding: 1,
+          marginBottom: 1,
+        }}
+      >
         <text>MAESTRO · TEST EXECUTION DASHBOARD · OpenTUI</text>
         <text>
-          {running ? "RUNNING" : exitCode === 0 ? "PASSED" : exitCode === null ? "IDLE" : "FAILED"} · {seconds}s · run #{runCount}
+          {running
+            ? "RUNNING"
+            : exitCode === 0
+              ? "PASSED"
+              : exitCode === null
+                ? "IDLE"
+                : "FAILED"}{" "}
+          · {seconds}s · run #{runCount}
         </text>
       </box>
 
       <box style={{ flexDirection: "row", height: 6, marginBottom: 1 }}>
-        <box style={{ flexGrow: 1, border: true, padding: 1, marginRight: 1 }} title="Suite">
+        <box
+          style={{ flexGrow: 1, border: true, padding: 1, marginRight: 1 }}
+          title="Suite"
+        >
           <text>Files: {testFiles.length || "—"}</text>
           <text>{testFiles.length ? testFiles.join(" · ") : "No execution yet"}</text>
           <text>Runner: Node.js native test runner</text>
@@ -192,7 +227,10 @@ function App() {
         </box>
       </box>
 
-      <box style={{ flexGrow: 1, border: true, padding: 1 }} title="Live stdout + stderr">
+      <box
+        style={{ flexGrow: 1, border: true, padding: 1 }}
+        title="Live stdout + stderr"
+      >
         <scrollbox style={{ flexGrow: 1 }}>
           {visible.map((line) => (
             <text
