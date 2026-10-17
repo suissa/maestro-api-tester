@@ -86,26 +86,29 @@ testRunner(
       assertReport(report, "load");
     });
 
-    await t.test("fail-on-error exits unsuccessfully for HTTP failures", async () => {
-      await assert.rejects(
-        run(
-          [
-            "--type",
-            "benchmark",
-            "--requests",
-            "1",
-            "--concurrency",
-            "1",
-            "--fail-on-error",
-          ],
-          url.replace("/health", "/failure"),
-        ),
-        (error: unknown) =>
-          error instanceof Error &&
-          "code" in error &&
-          (error as NodeJS.ErrnoException).code === 1,
-      );
-    });
+    await t.test(
+      "fail-on-error exits unsuccessfully for HTTP failures",
+      async () => {
+        await assert.rejects(
+          run(
+            [
+              "--type",
+              "benchmark",
+              "--requests",
+              "1",
+              "--concurrency",
+              "1",
+              "--fail-on-error",
+            ],
+            url.replace("/health", "/failure"),
+          ),
+          (error: unknown) =>
+            error instanceof Error &&
+            "code" in error &&
+            (error as NodeJS.ErrnoException).code === 1,
+        );
+      },
+    );
 
     await t.test("stress", async () => {
       const reports = await run([
