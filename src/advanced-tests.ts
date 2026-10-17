@@ -415,7 +415,9 @@ function parseArgs(args: string[]): TestOptions {
     timeoutMs:
       values.timeout !== undefined ? Number(values.timeout) : undefined,
     maxConcurrency:
-      values.maxConcurrency !== undefined ? Number(values.maxConcurrency) : undefined,
+      values.maxConcurrency !== undefined
+        ? Number(values.maxConcurrency)
+        : undefined,
     stepConcurrency:
       values.step !== undefined ? Number(values.step) : undefined,
     chaosRate:
@@ -456,4 +458,3 @@ if (
 ) {
   await main();
 }
-
