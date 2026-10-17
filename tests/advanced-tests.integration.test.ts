@@ -10,8 +10,8 @@ const execFileAsync = promisify(execFile);
 testRunner(
   "all advanced test modes execute the CLI and return valid reports",
   async (t) => {
-    const server = createServer((_request, response) => {
-      response.writeHead(200, {
+    const server = createServer((request, response) => {
+      response.writeHead(request.url === "/failure" ? 500 : 200, {
         "content-type": "application/json",
         "content-security-policy": "default-src 'self'",
         "x-content-type-options": "nosniff",
@@ -28,14 +28,14 @@ testRunner(
     const address = server.address();
     assert.ok(address && typeof address !== "string");
     const url = `http://127.0.0.1:${address.port}/health`;
-    const run = async (args: string[]) => {
+    const run = async (args: string[], targetUrl = url) => {
       const { stdout } = await execFileAsync(
         process.execPath,
         [
           "--experimental-strip-types",
           "src/advanced-tests.ts",
           "--url",
-          url,
+          targetUrl,
           ...args,
         ],
         {
@@ -84,6 +84,27 @@ testRunner(
       ]);
       assert.ok(!Array.isArray(report));
       assertReport(report, "load");
+    });
+
+    await t.test("fail-on-error exits unsuccessfully for HTTP failures", async () => {
+      await assert.rejects(
+        run(
+          [
+            "--type",
+            "benchmark",
+            "--requests",
+            "1",
+            "--concurrency",
+            "1",
+            "--fail-on-error",
+          ],
+          url.replace("/health", "/failure"),
+        ),
+        (error: unknown) =>
+          error instanceof Error &&
+          "code" in error &&
+          (error as NodeJS.ErrnoException).code === 1,
+      );
     });
 
     await t.test("stress", async () => {
