@@ -25,7 +25,11 @@ function classify(text: string, fallback: LineKind): LineKind {
 function App() {
   const [lines, setLines] = useState<OutputLine[]>([
     { id: 0, text: "MAESTRO TEST EXECUTION", kind: "info" },
-    { id: 1, text: "Press Enter or R to run the complete suite.", kind: "info" },
+    {
+      id: 1,
+      text: "Press Enter or R to run the complete suite.",
+      kind: "info",
+    },
   ]);
   const [running, setRunning] = useState(false);
   const [exitCode, setExitCode] = useState<number | null>(null);
@@ -217,7 +221,9 @@ function App() {
           title="Suite"
         >
           <text>Files: {testFiles.length || "—"}</text>
-          <text>{testFiles.length ? testFiles.join(" · ") : "No execution yet"}</text>
+          <text>
+            {testFiles.length ? testFiles.join(" · ") : "No execution yet"}
+          </text>
           <text>Runner: Node.js native test runner</text>
         </box>
         <box style={{ width: 34, border: true, padding: 1 }} title="Result">
