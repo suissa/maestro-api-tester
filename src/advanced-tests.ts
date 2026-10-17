@@ -406,15 +406,13 @@ function parseArgs(args: string[]): TestOptions {
     kind,
     url: values.url,
     method: values.method ?? "GET",
-    concurrency: values.concurrency ? Number(values.concurrency) : undefined,
-    durationSeconds: values.duration ? Number(values.duration) : undefined,
-    requests: values.requests ? Number(values.requests) : undefined,
-    timeoutMs: values.timeout ? Number(values.timeout) : undefined,
-    maxConcurrency: values.maxConcurrency
-      ? Number(values.maxConcurrency)
-      : undefined,
-    stepConcurrency: values.step ? Number(values.step) : undefined,
-    chaosRate: values.chaosRate ? Number(values.chaosRate) : undefined,
+    concurrency: values.concurrency !== undefined ? Number(values.concurrency) : undefined,
+    durationSeconds: values.duration !== undefined ? Number(values.duration) : undefined,
+    requests: values.requests !== undefined ? Number(values.requests) : undefined,
+    timeoutMs: values.timeout !== undefined ? Number(values.timeout) : undefined,
+    maxConcurrency: values.maxConcurrency !== undefined ? Number(values.maxConcurrency) : undefined,
+    stepConcurrency: values.step !== undefined ? Number(values.step) : undefined,
+    chaosRate: values.chaosRate !== undefined ? Number(values.chaosRate) : undefined,
     headers: Object.keys(headers).length ? headers : undefined,
     body: values.body,
   };
