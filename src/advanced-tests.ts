@@ -15,6 +15,7 @@ export interface TestOptions {
   chaosRate?: number;
   headers?: Record<string, string>;
   body?: string;
+  failOnError?: boolean;
 }
 
 export interface RequestSample {
@@ -377,6 +378,10 @@ function parseArgs(args: string[]): TestOptions {
     const arg = args[index];
     if (!arg.startsWith("--")) continue;
     const key = arg.slice(2);
+    if (key === "fail-on-error") {
+      values[key] = "true";
+      continue;
+    }
     const value = args[index + 1];
     if (!value || value.startsWith("--"))
       throw new Error(`Missing value for --${key}`);
@@ -424,34 +429,42 @@ function parseArgs(args: string[]): TestOptions {
       values.chaosRate !== undefined ? Number(values.chaosRate) : undefined,
     headers: Object.keys(headers).length ? headers : undefined,
     body: values.body,
+    failOnError: values["fail-on-error"] === "true",
   };
 }
 
 export async function main(args = process.argv.slice(2)): Promise<void> {
   try {
     const options = parseArgs(args);
+    let output: TestReport | TestReport[];
     if (options.kind === "security") {
-      console.log(JSON.stringify(await runSecurityChecks(options), null, 2));
+      output = await runSecurityChecks(options);
     } else if (options.kind === "stress") {
-      console.log(JSON.stringify(await runStressTest(options), null, 2));
+      output = await runStressTest(options);
     } else if (options.kind === "chaos") {
-      const report = await runLoadTest({
+      output = await runLoadTest({
         ...options,
         kind: "chaos",
         chaosRate: options.chaosRate ?? 0.1,
       } as TestOptions & { chaosRate: number });
-      console.log(JSON.stringify(report, null, 2));
     } else if (options.kind === "benchmark") {
-      console.log(JSON.stringify(await runBenchmark(options), null, 2));
+      output = await runBenchmark(options);
     } else {
-      console.log(JSON.stringify(await runLoadTest(options), null, 2));
+      output = await runLoadTest(options);
+    }
+
+    console.log(JSON.stringify(output, null, 2));
+    if (options.failOnError) {
+      const reports = Array.isArray(output) ? output : [output];
+      if (reports.some((report) => report.failures > 0)) {
+        process.exitCode = 1;
+      }
     }
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
     process.exitCode = 1;
   }
 }
-
 if (
   process.argv[1] &&
   import.meta.url === new URL(`file://${process.argv[1]}`).href
