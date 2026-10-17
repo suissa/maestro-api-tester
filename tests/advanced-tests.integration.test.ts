@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
+import { execFile } from "node:child_process";
 import { createServer } from "node:http";
 import { once } from "node:events";
+import { promisify } from "node:util";
 import testRunner from "node:test";
+
+const execFileAsync = promisify(execFile);
 
 testRunner(
   "all advanced test modes execute the CLI and return valid reports",
@@ -25,8 +28,8 @@ testRunner(
     const address = server.address();
     assert.ok(address && typeof address !== "string");
     const url = `http://127.0.0.1:${address.port}/health`;
-    const run = (args: string[]) => {
-      const output = execFileSync(
+    const run = async (args: string[]) => {
+      const { stdout } = await execFileAsync(
         process.execPath,
         [
           "--experimental-strip-types",
@@ -52,7 +55,7 @@ testRunner(
           },
         },
       );
-      return JSON.parse(output) as
+      return JSON.parse(stdout) as
         Record<string, unknown> | Array<Record<string, unknown>>;
     };
     const assertReport = (report: Record<string, unknown>, kind: string) => {
@@ -70,8 +73,8 @@ testRunner(
       assert.equal(typeof report.statusCodes, "object");
     };
 
-    await t.test("load", () => {
-      const report = run([
+    await t.test("load", async () => {
+      const report = await run([
         "--type",
         "load",
         "--duration",
@@ -83,8 +86,8 @@ testRunner(
       assertReport(report, "load");
     });
 
-    await t.test("stress", () => {
-      const reports = run([
+    await t.test("stress", async () => {
+      const reports = await run([
         "--type",
         "stress",
         "--duration",
@@ -99,7 +102,7 @@ testRunner(
       for (const report of reports) assertReport(report, "stress");
     });
 
-    await t.test("chaos", () => {
+    await t.test("chaos", async () => {
       const report = run([
         "--type",
         "chaos",
@@ -114,7 +117,7 @@ testRunner(
       assertReport(report, "chaos");
     });
 
-    await t.test("security", () => {
+    await t.test("security", async () => {
       const report = run(["--type", "security"]);
       assert.ok(!Array.isArray(report));
       assert.equal(report.kind, "security");
@@ -132,7 +135,7 @@ testRunner(
       );
     });
 
-    await t.test("benchmark", () => {
+    await t.test("benchmark", async () => {
       const report = run([
         "--type",
         "benchmark",
