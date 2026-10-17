@@ -13,7 +13,12 @@
     "dashboard": "bun dashboard/index.tsx",
     "start": "node --experimental-strip-types src/server.ts",
     "test:dashboard": "bun packages/tui/maestro-tui/src/index.tsx",
-    "test:dashboard:run": "node --experimental-strip-types --test --test-reporter=spec tests/*.test.ts"
+    "test:dashboard:run": "node --experimental-strip-types --test --test-reporter=spec tests/*.test.ts",
+    "test:load": "node --experimental-strip-types src/advanced-tests.ts --type load",
+    "test:stress": "node --experimental-strip-types src/advanced-tests.ts --type stress",
+    "test:chaos": "node --experimental-strip-types src/advanced-tests.ts --type chaos",
+    "test:security": "node --experimental-strip-types src/advanced-tests.ts --type security",
+    "test:benchmark": "node --experimental-strip-types src/advanced-tests.ts --type benchmark"
   },
   "engines": {
     "node": ">=22.6"

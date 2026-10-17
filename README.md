@@ -31,6 +31,31 @@ I.hope.this().isFalse(response.status !== 200);
 
 Boolean helpers are generated from the primitive `is(what, value)`. The false predicate is equivalent to `(value) => !(value)`.
 
+## Advanced HTTP test types
+
+Run the advanced test runner with Node 22.6+:
+
+```bash
+# Load: fixed concurrency for 30 seconds
+npm run test:load -- --url http://localhost:3000/health --duration 30 --concurrency 20
+
+# Stress: ramp concurrency in steps up to 100 workers
+npm run test:stress -- --url http://localhost:3000/health --duration 10 --maxConcurrency 100 --step 20
+
+# Chaos: inject client-side aborted attempts (10% by default)
+npm run test:chaos -- --url http://localhost:3000/health --duration 30 --concurrency 10 --chaosRate 0.1
+
+# Security: passive HTTP security-header and information-disclosure checks
+npm run test:security -- --url https://example.com
+
+# Benchmark: fixed request count (100 by default)
+npm run test:benchmark -- --url http://localhost:3000/health --requests 500 --concurrency 1
+```
+
+Performance modes accept `--method POST`, `--body '{"hello":"world"}'`, `--header 'Authorization: Bearer token;Content-Type: application/json'`, and `--timeout 5000`. Reports are JSON and include throughput, status codes, errors, and latency min/p50/p95/p99/max/mean. Stress mode emits a report per concurrency step.
+
+**Safety:** run load/stress/chaos tests only against systems you own or are authorized to test. Start with low concurrency and short duration. Chaos mode injects client-side failures only; it does not terminate processes, mutate infrastructure, or simulate server-side outages. Security checks are passive baseline checks, not a full penetration test or substitute for a security audit.
+
 ## Local API
 
 ```bash
