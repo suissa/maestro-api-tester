@@ -35,7 +35,22 @@ testRunner(
           url,
           ...args,
         ],
-        { encoding: "utf8", timeout: 15_000 },
+        {
+          encoding: "utf8",
+          timeout: 15_000,
+          env: {
+            ...process.env,
+            HTTP_PROXY: "",
+            HTTPS_PROXY: "",
+            ALL_PROXY: "",
+            http_proxy: "",
+            https_proxy: "",
+            all_proxy: "",
+            NO_PROXY: "127.0.0.1,localhost",
+            no_proxy: "127.0.0.1,localhost",
+            NODE_USE_ENV_PROXY: "0",
+          },
+        },
       );
       return JSON.parse(output) as
         Record<string, unknown> | Array<Record<string, unknown>>;
