@@ -32,7 +32,14 @@ export interface TestReport {
   successes: number;
   failures: number;
   requestsPerSecond: number;
-  latencyMs: { min: number; p50: number; p95: number; p99: number; max: number; mean: number };
+  latencyMs: {
+    min: number;
+    p50: number;
+    p95: number;
+    p99: number;
+    max: number;
+    mean: number;
+  };
   statusCodes: Record<string, number>;
   errors: Record<string, number>;
   checks?: Array<{ name: string; passed: boolean; detail: string }>;
@@ -43,12 +50,17 @@ const DEFAULT_TIMEOUT_MS = 5_000;
 export function percentile(values: number[], quantile: number): number {
   if (values.length === 0) return 0;
   const sorted = [...values].sort((a, b) => a - b);
-  const index = Math.min(sorted.length - 1, Math.max(0, Math.ceil(quantile * sorted.length) - 1));
+  const index = Math.min(
+    sorted.length - 1,
+    Math.max(0, Math.ceil(quantile * sorted.length) - 1),
+  );
   return Number(sorted[index].toFixed(2));
 }
 
 export function summarizeLatencies(values: number[]): TestReport["latencyMs"] {
-  if (values.length === 0) return { min: 0, p50: 0, p95: 0, p99: 0, max: 0, mean: 0 };
+  if (values.length === 0) {
+    return { min: 0, p50: 0, p95: 0, p99: 0, max: 0, mean: 0 };
+  }
   const sum = values.reduce((total, value) => total + value, 0);
   const min = values.reduce((best, value) => Math.min(best, value), Number.POSITIVE_INFINITY);
   const max = values.reduce((best, value) => Math.max(best, value), Number.NEGATIVE_INFINITY);
@@ -62,13 +74,17 @@ export function summarizeLatencies(values: number[]): TestReport["latencyMs"] {
   };
 }
 
-function validateOptions(options: TestOptions): Required<Pick<TestOptions, "concurrency" | "timeoutMs">> {
+function validateOptions(
+  options: TestOptions,
+): Required<Pick<TestOptions, "concurrency" | "timeoutMs">> {
   const concurrency = options.concurrency ?? 10;
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > 1000) {
     throw new Error("concurrency must be an integer between 1 and 1000");
   }
-  if (!Number.isFinite(timeoutMs) || timeoutMs < 1) throw new Error("timeoutMs must be positive");
+  if (!Number.isFinite(timeoutMs) || timeoutMs < 1) {
+    throw new Error("timeoutMs must be positive");
+  }
   const parsed = new URL(options.url);
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
     throw new Error("url must use http:// or https://");
@@ -76,11 +92,17 @@ function validateOptions(options: TestOptions): Required<Pick<TestOptions, "conc
   return { concurrency, timeoutMs };
 }
 
-async function requestOnce(options: TestOptions, timeoutMs: number, chaosRate = 0): Promise<RequestSample> {
+async function requestOnce(
+  options: TestOptions,
+  timeoutMs: number,
+  chaosRate = 0,
+): Promise<RequestSample> {
   const started = performance.now();
   try {
     if (chaosRate > 0 && Math.random() < chaosRate) {
-      await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * Math.min(timeoutMs, 250))));
+      await new Promise((resolve) =>
+        setTimeout(resolve, Math.floor(Math.random() * Math.min(timeoutMs, 250))),
+      );
       throw new Error("chaos: injected client-side abort");
     }
     const response = await fetch(options.url, {
@@ -99,7 +121,13 @@ async function requestOnce(options: TestOptions, timeoutMs: number, chaosRate = 
   }
 }
 
-function makeReport(kind: TestKind, url: string, startedAt: string, durationMs: number, samples: RequestSample[]): TestReport {
+function makeReport(
+  kind: TestKind,
+  url: string,
+  startedAt: string,
+  durationMs: number,
+  samples: RequestSample[],
+): TestReport {
   const statusCodes: Record<string, number> = {};
   const errors: Record<string, number> = {};
   for (const sample of samples) {
@@ -118,14 +146,21 @@ function makeReport(kind: TestKind, url: string, startedAt: string, durationMs: 
     requests: samples.length,
     successes,
     failures: samples.length - successes,
-    requestsPerSecond: durationMs > 0 ? Number((samples.length / (durationMs / 1000)).toFixed(2)) : 0,
+    requestsPerSecond:
+      durationMs > 0 ? Number((samples.length / (durationMs / 1000)).toFixed(2)) : 0,
     latencyMs: summarizeLatencies(samples.map((sample) => sample.latencyMs)),
     statusCodes,
     errors,
   };
 }
 
-async function runWorkers(options: TestOptions, concurrency: number, stopAt: number, maxRequests: number, chaosRate = 0): Promise<RequestSample[]> {
+async function runWorkers(
+  options: TestOptions,
+  concurrency: number,
+  stopAt: number,
+  maxRequests: number,
+  chaosRate = 0,
+): Promise<RequestSample[]> {
   const samples: RequestSample[] = [];
   let next = 0;
   const worker = async () => {
@@ -153,7 +188,13 @@ export async function runLoadTest(options: TestOptions): Promise<TestReport> {
     options.requests ?? Number.MAX_SAFE_INTEGER,
     (options as TestOptions & { chaosRate?: number }).chaosRate ?? 0,
   );
-  return makeReport(options.kind, options.url, startedAt, performance.now() - start, samples);
+  return makeReport(
+    options.kind,
+    options.url,
+    startedAt,
+    performance.now() - start,
+    samples,
+  );
 }
 
 export async function runStressTest(options: TestOptions): Promise<TestReport[]> {
@@ -162,12 +203,18 @@ export async function runStressTest(options: TestOptions): Promise<TestReport[]>
   if (!Number.isInteger(maxConcurrency) || maxConcurrency < 1 || maxConcurrency > 1000) {
     throw new Error("maxConcurrency must be an integer between 1 and 1000");
   }
-  if (!Number.isInteger(step) || step < 1) throw new Error("stepConcurrency must be a positive integer");
+  if (!Number.isInteger(step) || step < 1) {
+    throw new Error("stepConcurrency must be a positive integer");
+  }
   const reports: TestReport[] = [];
   for (let concurrency = step; concurrency < maxConcurrency; concurrency += step) {
-    reports.push(await runLoadTest({ ...options, kind: "stress", concurrency }));
+    reports.push(
+      await runLoadTest({ ...options, kind: "stress", concurrency }),
+    );
   }
-  reports.push(await runLoadTest({ ...options, kind: "stress", concurrency: maxConcurrency }));
+  reports.push(
+    await runLoadTest({ ...options, kind: "stress", concurrency: maxConcurrency }),
+  );
   return reports;
 }
 
@@ -176,7 +223,11 @@ export async function runChaosTest(options: TestOptions): Promise<TestReport> {
   if (!Number.isFinite(rate) || rate < 0 || rate > 0.9) {
     throw new Error("chaosRate must be between 0 and 0.9");
   }
-  return runLoadTest({ ...options, kind: "chaos", chaosRate: rate } as TestOptions & { chaosRate: number });
+  return runLoadTest({
+    ...options,
+    kind: "chaos",
+    chaosRate: rate,
+  } as TestOptions & { chaosRate: number });
 }
 
 export async function runBenchmark(options: TestOptions): Promise<TestReport> {
@@ -232,7 +283,11 @@ export async function runSecurityChecks(options: TestOptions): Promise<TestRepor
         detail: headers.get("strict-transport-security") ?? "missing Strict-Transport-Security",
       });
     } else {
-      checks.push({ name: "HTTPS", passed: false, detail: "target uses HTTP; HTTPS is recommended" });
+      checks.push({
+      name: "HTTPS",
+      passed: false,
+      detail: "target uses HTTP; HTTPS is recommended",
+    });
     }
     const server = headers.get("server");
     checks.push({
@@ -284,7 +339,9 @@ function parseArgs(args: string[]): TestOptions {
   if (values.header) {
     for (const item of values.header.split(";")) {
       const separator = item.indexOf(":");
-      if (separator <= 0) throw new Error("--header format is Name: value;Name2: value2");
+      if (separator <= 0) {
+        throw new Error("--header format is Name: value;Name2: value2");
+      }
       headers[item.slice(0, separator).trim()] = item.slice(separator + 1).trim();
     }
   }
@@ -329,6 +386,9 @@ export async function main(args = process.argv.slice(2)): Promise<void> {
   }
 }
 
-if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+if (
+  process.argv[1] &&
+  import.meta.url === new URL(`file://${process.argv[1]}`).href
+) {
   await main();
 }
