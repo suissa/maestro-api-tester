@@ -11,7 +11,12 @@
     "noEmit": true,
     "allowJs": false,
     "allowImportingTsExtensions": true,
-    "types": ["node", "react"]
+    "types": ["node", "react", "bun"]
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "dashboard/**/*.tsx"]
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    "dashboard/**/*.tsx",
+    "packages/tui/maestro-tui/src/**/*.tsx"
+  ]
 }
