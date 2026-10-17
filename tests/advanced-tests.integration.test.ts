@@ -103,7 +103,7 @@ testRunner(
     });
 
     await t.test("chaos", async () => {
-      const report = run([
+      const report = await run([
         "--type",
         "chaos",
         "--duration",
@@ -118,7 +118,7 @@ testRunner(
     });
 
     await t.test("security", async () => {
-      const report = run(["--type", "security"]);
+      const report = await run(["--type", "security"]);
       assert.ok(!Array.isArray(report));
       assert.equal(report.kind, "security");
       assert.ok(Array.isArray(report.checks));
@@ -136,7 +136,7 @@ testRunner(
     });
 
     await t.test("benchmark", async () => {
-      const report = run([
+      const report = await run([
         "--type",
         "benchmark",
         "--requests",
