@@ -52,7 +52,7 @@ npm run test:security -- --url https://example.com
 npm run test:benchmark -- --url http://localhost:3000/health --requests 500 --concurrency 1
 ```
 
-Performance modes accept `--method POST`, `--body '{"hello":"world"}'`, `--header 'Authorization: Bearer token;Content-Type: application/json'`, and `--timeout 5000`. Reports are JSON and include throughput, status codes, errors, and latency min/p50/p95/p99/max/mean. Stress mode emits a report per concurrency step.
+Performance modes accept `--method POST`, `--body '{"hello":"world"}'`, `--header 'Authorization: Bearer token;Content-Type: application/json'`, and `--timeout 5000`. Reports are JSON and include throughput, status codes, errors, and latency min/p50/p95/p99/max/mean. Stress mode emits a report per concurrency step. Add `--fail-on-error` to return a non-zero process exit code when any request fails (HTTP status 400+ or a transport/timeout error); this makes the modes suitable for CI quality gates. For security mode, the flag also fails the command when one or more security checks do not pass.
 
 **Safety:** run load/stress/chaos tests only against systems you own or are authorized to test. Start with low concurrency and short duration. Chaos mode injects client-side failures only; it does not terminate processes, mutate infrastructure, or simulate server-side outages. Security checks are passive baseline checks, not a full penetration test or substitute for a security audit.
 
