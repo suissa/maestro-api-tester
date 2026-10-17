@@ -56,10 +56,11 @@ function App() {
   const run = async () => {
     if (running) return;
 
+    const runStartedAt = Date.now();
     setRunning(true);
     setExitCode(null);
     setRunCount((value) => value + 1);
-    setStartedAt(Date.now());
+    setStartedAt(runStartedAt);
     setElapsed(0);
     setSelected(0);
 
@@ -127,7 +128,8 @@ function App() {
       append(error instanceof Error ? error.stack ?? error.message : String(error), "fail");
       setExitCode(1);
     } finally {
-      setElapsed(startedAt === null ? 0 : Date.now() - startedAt);
+      setElapsed(Date.now() - runStartedAt);
+      setStartedAt(null);
       setRunning(false);
     }
   };
@@ -171,9 +173,7 @@ function App() {
       }}
     >
       <box style={{ flexDirection: "column", border: true, padding: 1, marginBottom: 1 }}>
-        <text>
-          MAESTRO · TEST EXECUTION DASHBOARD · OpenTUI
-        </text>
+        <text>MAESTRO · TEST EXECUTION DASHBOARD · OpenTUI</text>
         <text>
           {running ? "RUNNING" : exitCode === 0 ? "PASSED" : exitCode === null ? "IDLE" : "FAILED"} · {seconds}s · run #{runCount}
         </text>
