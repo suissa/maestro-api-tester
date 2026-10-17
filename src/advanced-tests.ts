@@ -62,8 +62,14 @@ export function summarizeLatencies(values: number[]): TestReport["latencyMs"] {
     return { min: 0, p50: 0, p95: 0, p99: 0, max: 0, mean: 0 };
   }
   const sum = values.reduce((total, value) => total + value, 0);
-  const min = values.reduce((best, value) => Math.min(best, value), Number.POSITIVE_INFINITY);
-  const max = values.reduce((best, value) => Math.max(best, value), Number.NEGATIVE_INFINITY);
+  const min = values.reduce(
+    (best, value) => Math.min(best, value),
+    Number.POSITIVE_INFINITY,
+  );
+  const max = values.reduce(
+    (best, value) => Math.max(best, value),
+    Number.NEGATIVE_INFINITY,
+  );
   return {
     min: Number(min.toFixed(2)),
     p50: percentile(values, 0.5),
@@ -101,7 +107,10 @@ async function requestOnce(
   try {
     if (chaosRate > 0 && Math.random() < chaosRate) {
       await new Promise((resolve) =>
-        setTimeout(resolve, Math.floor(Math.random() * Math.min(timeoutMs, 250))),
+        setTimeout(
+          resolve,
+          Math.floor(Math.random() * Math.min(timeoutMs, 250)),
+        ),
       );
       throw new Error("chaos: injected client-side abort");
     }
@@ -149,7 +158,9 @@ function makeReport(
     successes,
     failures: samples.length - successes,
     requestsPerSecond:
-      durationMs > 0 ? Number((samples.length / (durationMs / 1000)).toFixed(2)) : 0,
+      durationMs > 0
+        ? Number((samples.length / (durationMs / 1000)).toFixed(2))
+        : 0,
     latencyMs: summarizeLatencies(samples.map((sample) => sample.latencyMs)),
     statusCodes,
     errors,
@@ -168,7 +179,13 @@ async function runWorkers(
   const worker = async () => {
     while (performance.now() < stopAt && next < maxRequests) {
       next += 1;
-      samples.push(await requestOnce(options, options.timeoutMs ?? DEFAULT_TIMEOUT_MS, chaosRate));
+      samples.push(
+        await requestOnce(
+          options,
+          options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+          chaosRate,
+        ),
+      );
     }
   };
   await Promise.all(Array.from({ length: concurrency }, () => worker()));
@@ -178,7 +195,11 @@ async function runWorkers(
 export async function runLoadTest(options: TestOptions): Promise<TestReport> {
   const { concurrency, timeoutMs } = validateOptions(options);
   const durationSeconds = options.durationSeconds ?? 30;
-  if (!Number.isFinite(durationSeconds) || durationSeconds <= 0 || durationSeconds > 3600) {
+  if (
+    !Number.isFinite(durationSeconds) ||
+    durationSeconds <= 0 ||
+    durationSeconds > 3600
+  ) {
     throw new Error("durationSeconds must be between 0 and 3600");
   }
   const startedAt = new Date().toISOString();
@@ -199,23 +220,38 @@ export async function runLoadTest(options: TestOptions): Promise<TestReport> {
   );
 }
 
-export async function runStressTest(options: TestOptions): Promise<TestReport[]> {
+export async function runStressTest(
+  options: TestOptions,
+): Promise<TestReport[]> {
   const maxConcurrency = options.maxConcurrency ?? 100;
-  const step = options.stepConcurrency ?? Math.max(1, Math.ceil(maxConcurrency / 5));
-  if (!Number.isInteger(maxConcurrency) || maxConcurrency < 1 || maxConcurrency > 1000) {
+  const step =
+    options.stepConcurrency ?? Math.max(1, Math.ceil(maxConcurrency / 5));
+  if (
+    !Number.isInteger(maxConcurrency) ||
+    maxConcurrency < 1 ||
+    maxConcurrency > 1000
+  ) {
     throw new Error("maxConcurrency must be an integer between 1 and 1000");
   }
   if (!Number.isInteger(step) || step < 1) {
     throw new Error("stepConcurrency must be a positive integer");
   }
   const reports: TestReport[] = [];
-  for (let concurrency = step; concurrency < maxConcurrency; concurrency += step) {
+  for (
+    let concurrency = step;
+    concurrency < maxConcurrency;
+    concurrency += step
+  ) {
     reports.push(
       await runLoadTest({ ...options, kind: "stress", concurrency }),
     );
   }
   reports.push(
-    await runLoadTest({ ...options, kind: "stress", concurrency: maxConcurrency }),
+    await runLoadTest({
+      ...options,
+      kind: "stress",
+      concurrency: maxConcurrency,
+    }),
   );
   return reports;
 }
@@ -246,10 +282,18 @@ export async function runBenchmark(options: TestOptions): Promise<TestReport> {
     Number.POSITIVE_INFINITY,
     requests,
   );
-  return makeReport("benchmark", options.url, startedAt, performance.now() - start, samples);
+  return makeReport(
+    "benchmark",
+    options.url,
+    startedAt,
+    performance.now() - start,
+    samples,
+  );
 }
 
-export async function runSecurityChecks(options: TestOptions): Promise<TestReport> {
+export async function runSecurityChecks(
+  options: TestOptions,
+): Promise<TestReport> {
   validateOptions(options);
   const startedAt = new Date().toISOString();
   const start = performance.now();
@@ -282,26 +326,32 @@ export async function runSecurityChecks(options: TestOptions): Promise<TestRepor
       checks.push({
         name: "Strict-Transport-Security",
         passed: Boolean(headers.get("strict-transport-security")),
-        detail: headers.get("strict-transport-security") ?? "missing Strict-Transport-Security",
+        detail:
+          headers.get("strict-transport-security") ??
+          "missing Strict-Transport-Security",
       });
     } else {
       checks.push({
-      name: "HTTPS",
-      passed: false,
-      detail: "target uses HTTP; HTTPS is recommended",
-    });
+        name: "HTTPS",
+        passed: false,
+        detail: "target uses HTTP; HTTPS is recommended",
+      });
     }
     const server = headers.get("server");
     checks.push({
       name: "Server banner",
       passed: !server,
-      detail: server ? `server banner disclosed: ${server}` : "no Server header exposed",
+      detail: server
+        ? `server banner disclosed: ${server}`
+        : "no Server header exposed",
     });
     const poweredBy = headers.get("x-powered-by");
     checks.push({
       name: "X-Powered-By",
       passed: !poweredBy,
-      detail: poweredBy ? `technology disclosed: ${poweredBy}` : "no X-Powered-By header exposed",
+      detail: poweredBy
+        ? `technology disclosed: ${poweredBy}`
+        : "no X-Powered-By header exposed",
     });
     await response.body?.cancel();
   } catch (error) {
@@ -328,13 +378,16 @@ function parseArgs(args: string[]): TestOptions {
     if (!arg.startsWith("--")) continue;
     const key = arg.slice(2);
     const value = args[index + 1];
-    if (!value || value.startsWith("--")) throw new Error(`Missing value for --${key}`);
+    if (!value || value.startsWith("--"))
+      throw new Error(`Missing value for --${key}`);
     values[key] = value;
     index += 1;
   }
   const kind = values.type as TestKind;
   if (!["load", "stress", "chaos", "security", "benchmark"].includes(kind)) {
-    throw new Error("--type must be load, stress, chaos, security, or benchmark");
+    throw new Error(
+      "--type must be load, stress, chaos, security, or benchmark",
+    );
   }
   if (!values.url) throw new Error("--url is required");
   const headers: Record<string, string> = {};
@@ -344,7 +397,9 @@ function parseArgs(args: string[]): TestOptions {
       if (separator <= 0) {
         throw new Error("--header format is Name: value;Name2: value2");
       }
-      headers[item.slice(0, separator).trim()] = item.slice(separator + 1).trim();
+      headers[item.slice(0, separator).trim()] = item
+        .slice(separator + 1)
+        .trim();
     }
   }
   return {
@@ -355,7 +410,9 @@ function parseArgs(args: string[]): TestOptions {
     durationSeconds: values.duration ? Number(values.duration) : undefined,
     requests: values.requests ? Number(values.requests) : undefined,
     timeoutMs: values.timeout ? Number(values.timeout) : undefined,
-    maxConcurrency: values.maxConcurrency ? Number(values.maxConcurrency) : undefined,
+    maxConcurrency: values.maxConcurrency
+      ? Number(values.maxConcurrency)
+      : undefined,
     stepConcurrency: values.step ? Number(values.step) : undefined,
     chaosRate: values.chaosRate ? Number(values.chaosRate) : undefined,
     headers: Object.keys(headers).length ? headers : undefined,
@@ -394,4 +451,3 @@ if (
 ) {
   await main();
 }
-
