@@ -16,8 +16,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci
+      - run: npm install
       - name: Validate formatting, lint, types, and unit/integration tests
         run: npm run build
       - name: Verify advanced test CLI modes
