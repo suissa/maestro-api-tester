@@ -80,3 +80,4 @@ testRunner("all advanced test modes execute the CLI and return valid reports", a
     assert.equal(report.requests, 4);
   });
 });
+
