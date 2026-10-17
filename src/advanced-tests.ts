@@ -137,7 +137,9 @@ function makeReport(
     }
     if (sample.error) errors[sample.error] = (errors[sample.error] ?? 0) + 1;
   }
-  const successes = samples.filter((sample) => sample.status !== undefined && sample.status < 400).length;
+  const successes = samples.filter(
+    (sample) => sample.status !== undefined && sample.status < 400,
+  ).length;
   return {
     kind,
     url,
