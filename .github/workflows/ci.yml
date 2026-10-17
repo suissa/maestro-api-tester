@@ -4,13 +4,21 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install
-      - run: npm run build
+          cache: npm
+      - run: npm ci
+      - name: Validate formatting, lint, types, and unit/integration tests
+        run: npm run build
+      - name: Verify advanced test CLI modes
+        run: node --experimental-strip-types --test --test-reporter=spec tests/advanced-tests.integration.test.ts
