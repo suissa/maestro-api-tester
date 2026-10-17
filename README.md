@@ -12,14 +12,16 @@ Run tests without the TUI (suitable for CI):
 npm test
 ```
 
-Run tests interactively with live stdout/stderr, individual test results, errors, and the final exit status in the OpenTUI dashboard:
+Run the complete test suite interactively with the OpenTUI dashboard:
 
 ```bash
 bun install
-bun run test:dashboard
+npm run test:dashboard
 ```
 
-Press `Enter` or `R` to start/re-run the test suite. Use `↑`/`↓` to scroll output, `Home`/`End` to navigate, and `Q`/`Esc` to exit. The dashboard discovers every `*.test.ts` file under `tests/` and streams the native Node test runner's output while tests execute.
+The dashboard lives in `packages/tui/maestro-tui` and is the canonical TUI entry point. It discovers every `*.test.ts` file under `tests/`, starts Node's native test runner, and streams both stdout and stderr into the terminal UI while execution is in progress. The final exit status is retained on screen, and the dashboard shows the discovered files, elapsed time, output counts, and pass/fail lines.
+
+Press `Enter` or `R` to start/re-run the suite. Use `↑`/`↓` to scroll output, `Home`/`End` to navigate, and `Q`/`Esc` to exit.
 
 Assertions intentionally read like a sentence:
 
@@ -44,7 +46,7 @@ The sample server exposes:
 
 ## API request dashboard
 
-Launch the existing request dashboard with:
+Launch the request-oriented dashboard with:
 
 ```bash
 bun run dashboard

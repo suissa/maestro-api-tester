@@ -13,5 +13,10 @@
     "allowImportingTsExtensions": true,
     "types": ["node", "react"]
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "dashboard/**/*.tsx"]
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    "dashboard/**/*.tsx",
+    "packages/tui/maestro-tui/src/**/*.tsx"
+  ]
 }

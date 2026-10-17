@@ -1,7 +1,7 @@
 {
   "name": "maestro-api-tester",
   "version": "0.1.0",
-  "description": "A small API tester with a natural-language test DSL and OpenTUI dashboard",
+  "description": "A small API tester with a natural-language test DSL and OpenTUI + React terminal dashboards.",
   "type": "module",
   "scripts": {
     "build": "npm run format:check && npm run lint && npm run typecheck && npm test",
@@ -12,7 +12,7 @@
     "test": "node --experimental-strip-types --test tests/*.test.ts",
     "dashboard": "bun dashboard/index.tsx",
     "start": "node --experimental-strip-types src/server.ts",
-    "test:dashboard": "bun dashboard/tests.tsx",
+    "test:dashboard": "bun packages/tui/maestro-tui/src/index.tsx",
     "test:dashboard:run": "node --experimental-strip-types --test --test-reporter=spec tests/*.test.ts"
   },
   "engines": {
