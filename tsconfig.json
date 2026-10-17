@@ -11,7 +11,7 @@
     "noEmit": true,
     "allowJs": false,
     "allowImportingTsExtensions": true,
-    "types": ["node", "react", "bun"]
+    "types": ["node", "react"]
   },
   "include": [
     "src/**/*.ts",
