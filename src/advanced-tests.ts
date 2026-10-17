@@ -50,12 +50,14 @@ export function percentile(values: number[], quantile: number): number {
 export function summarizeLatencies(values: number[]): TestReport["latencyMs"] {
   if (values.length === 0) return { min: 0, p50: 0, p95: 0, p99: 0, max: 0, mean: 0 };
   const sum = values.reduce((total, value) => total + value, 0);
+  const min = values.reduce((best, value) => Math.min(best, value), Number.POSITIVE_INFINITY);
+  const max = values.reduce((best, value) => Math.max(best, value), Number.NEGATIVE_INFINITY);
   return {
-    min: Number(Math.min(...values).toFixed(2)),
+    min: Number(min.toFixed(2)),
     p50: percentile(values, 0.5),
     p95: percentile(values, 0.95),
     p99: percentile(values, 0.99),
-    max: Number(Math.max(...values).toFixed(2)),
+    max: Number(max.toFixed(2)),
     mean: Number((sum / values.length).toFixed(2)),
   };
 }
@@ -107,7 +109,7 @@ function makeReport(kind: TestKind, url: string, startedAt: string, durationMs: 
     }
     if (sample.error) errors[sample.error] = (errors[sample.error] ?? 0) + 1;
   }
-  const successes = samples.filter((sample) => sample.status !== undefined && sample.status < 500).length;
+  const successes = samples.filter((sample) => sample.status !== undefined && sample.status < 400).length;
   return {
     kind,
     url,
@@ -149,6 +151,7 @@ export async function runLoadTest(options: TestOptions): Promise<TestReport> {
     concurrency,
     start + durationSeconds * 1000,
     options.requests ?? Number.MAX_SAFE_INTEGER,
+    (options as TestOptions & { chaosRate?: number }).chaosRate ?? 0,
   );
   return makeReport(options.kind, options.url, startedAt, performance.now() - start, samples);
 }
